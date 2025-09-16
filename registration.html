@@ -24,8 +24,129 @@
 	<script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 	<!-- In registration.html, signin.html, dashboard.html -->
 	
-	<!-- Additional styles for password field -->
+	<!-- Additional styles for password field and fallbacks -->
 	<style>
+		/* Fallback styles to ensure page displays even if CSS fails to load */
+		body {
+			font-family: 'Inter', Arial, sans-serif !important;
+			margin: 0 !important;
+			padding: 0 !important;
+			line-height: 1.6 !important;
+		}
+		
+		.navbar {
+			background: #dc143c !important;
+			padding: 15px 0 !important;
+			position: sticky !important;
+			top: 0 !important;
+			z-index: 1000 !important;
+		}
+		
+		.nav-container {
+			max-width: 1200px !important;
+			margin: 0 auto !important;
+			padding: 0 20px !important;
+			display: flex !important;
+			justify-content: space-between !important;
+			align-items: center !important;
+		}
+		
+		.nav-logo {
+			display: flex !important;
+			align-items: center !important;
+			text-decoration: none !important;
+			color: white !important;
+			font-weight: bold !important;
+			font-size: 1.2rem !important;
+		}
+		
+		.nav-logo img {
+			height: 40px !important;
+			margin-right: 10px !important;
+		}
+		
+		.nav-menu {
+			display: flex !important;
+			list-style: none !important;
+			margin: 0 !important;
+			padding: 0 !important;
+			gap: 30px !important;
+		}
+		
+		.nav-link {
+			color: white !important;
+			text-decoration: none !important;
+			font-weight: 500 !important;
+			transition: color 0.3s ease !important;
+		}
+		
+		.nav-link:hover {
+			color: #ffd700 !important;
+		}
+		
+		.registration-hero {
+			background: linear-gradient(135deg, #dc143c, #8b0000) !important;
+			color: white !important;
+			padding: 120px 0 80px !important;
+			text-align: center !important;
+		}
+		
+		.container {
+			max-width: 1200px !important;
+			margin: 0 auto !important;
+			padding: 0 20px !important;
+		}
+		
+		.registration-hero h1 {
+			font-size: 3.5rem !important;
+			margin-bottom: 1rem !important;
+			font-weight: 800 !important;
+		}
+		
+		.registration-hero p {
+			font-size: 1.3rem !important;
+			margin-bottom: 2rem !important;
+			max-width: 600px !important;
+			margin-left: auto !important;
+			margin-right: auto !important;
+		}
+		
+		.hero-stats {
+			display: flex !important;
+			justify-content: center !important;
+			gap: 60px !important;
+			margin-top: 3rem !important;
+		}
+		
+		.hero-stat {
+			text-align: center !important;
+		}
+		
+		.stat-number {
+			font-size: 2.5rem !important;
+			font-weight: 800 !important;
+			color: #ffd700 !important;
+		}
+		
+		.stat-label {
+			font-size: 1rem !important;
+			margin-top: 0.5rem !important;
+		}
+		
+		/* Mobile responsive */
+		@media (max-width: 768px) {
+			.nav-menu {
+				display: none !important;
+			}
+			.registration-hero h1 {
+				font-size: 2.5rem !important;
+			}
+			.hero-stats {
+				flex-direction: column !important;
+				gap: 30px !important;
+			}
+		}
+		
 		.input-wrapper {
 			position: relative;
 		}
@@ -566,10 +687,35 @@
 		</div>
 	</footer>
 
-	<!-- Load scripts asynchronously for better performance -->
-	<script async src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-	<script defer src="auth-system-fixed.js"></script>
-	<script defer src="script.js"></script>
+	<!-- Load scripts for better performance -->
+	<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+	<script>
+		// Initialize AOS immediately after it loads
+		if (typeof AOS !== 'undefined') {
+			AOS.init({
+				duration: 1000,
+				easing: 'ease-in-out',
+				once: true,
+				mirror: false
+			});
+		}
+		
+		// Mobile navigation toggle
+		document.addEventListener('DOMContentLoaded', function() {
+			const hamburger = document.querySelector('.hamburger');
+			const navMenu = document.querySelector('.nav-menu');
+			
+			if (hamburger && navMenu) {
+				hamburger.addEventListener('click', function() {
+					hamburger.classList.toggle('active');
+					navMenu.classList.toggle('active');
+				});
+			}
+			
+			console.log('✅ Registration page basic functionality loaded');
+		});
+	</script>
+	<script defer src="auth-nav-system.js"></script>
 	<script defer src="registration-form-final.js"></script>
 </body>
 </html>

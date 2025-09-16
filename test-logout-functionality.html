@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Logout Functionality - USRA</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa;
+        }
+        .test-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .test-section {
+            background: white;
+            margin: 20px 0;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-result {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            border-left: 4px solid;
+        }
+        .success {
+            background: #d4edda;
+            border-color: #28a745;
+            color: #155724;
+        }
+        .error {
+            background: #f8d7da;
+            border-color: #dc3545;
+            color: #721c24;
+        }
+        .info {
+            background: #d1ecf1;
+            border-color: #17a2b8;
+            color: #0c5460;
+        }
+        .warning {
+            background: #fff3cd;
+            border-color: #ffc107;
+            color: #856404;
+        }
+        .btn {
+            padding: 10px 20px;
+            margin: 5px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        .auth-demo {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <!-- Test Navigation with Logout Functionality -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-logo">
+                <img src="photos/usraLogo.png" alt="USRA Logo">
+                <span>USRA Logout Test</span>
+            </a>
+            <ul class="nav-menu">
+                <li><a href="index.html" class="nav-link">Home</a></li>
+                <li><a href="events.html" class="nav-link">Events</a></li>
+                <li><a href="signin.html" class="nav-link">Sign In</a></li>
+                <li><a href="registration.html" class="nav-link">Register</a></li>
+                <li class="nav-more">
+                    <a href="#" class="nav-link">More ↓</a>
+                    <ul class="dropdown-menu">
+                        <li><a href="leadership.html">Leadership</a></li>
+                        <li><a href="workplan.html">Workplan 2025</a></li>
+                        <li><a href="medical-fund.html">Medical Fund</a></li>
+                        <li><a href="photos.html">Photos</a></li>
+                    </ul>
+                </li>
+                <li id="navDashboard" style="display:none;"><a href="dashboard.html" class="nav-link">Dashboard</a></li>
+            </ul>
+            <div class="hamburger">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
+        </div>
+    </nav>
+
+    <div class="test-container">
+        <h1>🚪 USRA Logout Functionality Test</h1>
+        
+        <div class="test-section">
+            <h2>Authentication Status</h2>
+            <div id="auth-status">
+                <div class="test-result info">⏳ Checking authentication status...</div>
+            </div>
+            <div class="auth-demo">
+                <h4>Current State:</h4>
+                <p><strong>User:</strong> <span id="current-user">Loading...</span></p>
+                <p><strong>Status:</strong> <span id="auth-state">Checking...</span></p>
+                <p><strong>Navigation:</strong> <span id="nav-state">Updating...</span></p>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>Logout Options Available</h2>
+            <div id="logout-options">
+                <div class="test-result info">Checking for logout options in navigation...</div>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>Manual Logout Test</h2>
+            <p>Use these buttons to test logout functionality:</p>
+            <button class="btn btn-danger" onclick="testDirectLogout()">🚪 Direct Logout Test</button>
+            <button class="btn btn-primary" onclick="refreshAuthStatus()">🔄 Refresh Auth Status</button>
+            <button class="btn btn-success" onclick="simulateLogin()">👤 Simulate Login State</button>
+            <div id="manual-test-results"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>Expected Logout Behavior</h2>
+            <ul>
+                <li>✅ <strong>User Menu Dropdown:</strong> Contains logout option with confirmation</li>
+                <li>✅ <strong>Standalone Logout Button:</strong> Visible red logout button in navigation</li>
+                <li>✅ <strong>Mobile Menu:</strong> Logout option in dropdown/hamburger menu</li>
+                <li>✅ <strong>Confirmation:</strong> Shows "Are you sure?" dialog before logout</li>
+                <li>✅ <strong>Redirect:</strong> Redirects to home page after successful logout</li>
+                <li>✅ <strong>Session Cleanup:</strong> Clears all authentication data</li>
+                <li>✅ <strong>UI Update:</strong> Navigation shows "Sign In" link after logout</li>
+            </ul>
+        </div>
+
+        <div class="test-section">
+            <h2>Quick Actions</h2>
+            <a href="signin.html" class="btn btn-primary">Go to Sign In</a>
+            <a href="registration.html" class="btn btn-success">Go to Registration</a>
+            <a href="index.html" class="btn">Go to Home</a>
+        </div>
+    </div>
+
+    <!-- Load authentication system -->
+    <script defer src="auth-nav-system.js"></script>
+    
+    <script>
+        // Test functions
+        function addTestResult(message, type = 'info', containerId = 'auth-status') {
+            const container = document.getElementById(containerId);
+            const div = document.createElement('div');
+            div.className = `test-result ${type}`;
+            div.innerHTML = message;
+            container.appendChild(div);
+        }
+
+        function updateAuthDisplay() {
+            const currentUser = document.getElementById('current-user');
+            const authState = document.getElementById('auth-state');
+            const navState = document.getElementById('nav-state');
+
+            if (window.USRANavAuth) {
+                if (window.USRANavAuth.isAuthenticated && window.USRANavAuth.user) {
+                    currentUser.innerHTML = `<strong>${window.USRANavAuth.user.email}</strong>`;
+                    authState.innerHTML = '<span style="color: #28a745;">✅ Authenticated</span>';
+                    
+                    // Check for logout options in navigation
+                    checkLogoutOptions();
+                } else {
+                    currentUser.textContent = 'Not logged in';
+                    authState.innerHTML = '<span style="color: #dc3545;">❌ Not Authenticated</span>';
+                }
+                
+                navState.innerHTML = '<span style="color: #28a745;">✅ Navigation updated</span>';
+            } else {
+                currentUser.textContent = 'Auth system not loaded';
+                authState.innerHTML = '<span style="color: #ffc107;">⚠️ System loading...</span>';
+                navState.innerHTML = '<span style="color: #ffc107;">⚠️ Waiting for system...</span>';
+            }
+        }
+
+        function checkLogoutOptions() {
+            const logoutContainer = document.getElementById('logout-options');
+            logoutContainer.innerHTML = '';
+            
+            // Check for user dropdown logout
+            const userDropdownLogout = document.querySelector('.logout-btn');
+            if (userDropdownLogout) {
+                addTestResult('✅ User dropdown logout option found', 'success', 'logout-options');
+            } else {
+                addTestResult('❌ User dropdown logout option not found', 'error', 'logout-options');
+            }
+            
+            // Check for standalone logout button
+            const standaloneLogout = document.querySelector('.logout-standalone-btn');
+            if (standaloneLogout) {
+                addTestResult('✅ Standalone logout button found', 'success', 'logout-options');
+            } else {
+                addTestResult('❌ Standalone logout button not found', 'error', 'logout-options');
+            }
+            
+            // Check for mobile logout
+            const mobileLogout = document.querySelector('.mobile-logout-btn');
+            if (mobileLogout) {
+                addTestResult('✅ Mobile logout option found', 'success', 'logout-options');
+            } else {
+                addTestResult('⚠️ Mobile logout option not found (may be added dynamically)', 'warning', 'logout-options');
+            }
+        }
+
+        function testDirectLogout() {
+            if (window.USRANavAuth && window.USRANavAuth.logout) {
+                if (window.USRANavAuth.isAuthenticated) {
+                    addTestResult('🚪 Testing direct logout...', 'info', 'manual-test-results');
+                    window.USRANavAuth.logout();
+                } else {
+                    addTestResult('ℹ️ Not authenticated - cannot test logout', 'info', 'manual-test-results');
+                }
+            } else {
+                addTestResult('❌ Logout function not available', 'error', 'manual-test-results');
+            }
+        }
+
+        function refreshAuthStatus() {
+            if (window.USRANavAuth && window.USRANavAuth.checkStatus) {
+                addTestResult('🔄 Refreshing authentication status...', 'info', 'manual-test-results');
+                window.USRANavAuth.checkStatus().then(() => {
+                    addTestResult('✅ Auth status refreshed', 'success', 'manual-test-results');
+                    updateAuthDisplay();
+                }).catch(error => {
+                    addTestResult(`❌ Auth refresh failed: ${error.message}`, 'error', 'manual-test-results');
+                });
+            } else {
+                addTestResult('❌ Auth refresh function not available', 'error', 'manual-test-results');
+            }
+        }
+
+        function simulateLogin() {
+            addTestResult('ℹ️ To test with actual login, use the Sign In page', 'info', 'manual-test-results');
+            addTestResult('📝 This test page shows logout options when you are logged in', 'info', 'manual-test-results');
+        }
+
+        // Initialize tests when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            addTestResult('📝 Logout test page loaded', 'success');
+            
+            // Wait for auth system to initialize
+            let attempts = 0;
+            const maxAttempts = 50;
+            
+            const checkAuthSystem = () => {
+                attempts++;
+                
+                if (window.USRANavAuth && window.USRANavAuth.initialized) {
+                    addTestResult('✅ Authentication system loaded successfully', 'success');
+                    updateAuthDisplay();
+                    
+                    // Set up periodic updates
+                    setInterval(updateAuthDisplay, 3000);
+                    
+                } else if (attempts < maxAttempts) {
+                    setTimeout(checkAuthSystem, 100);
+                } else {
+                    addTestResult('❌ Authentication system failed to load', 'error');
+                }
+            };
+            
+            setTimeout(checkAuthSystem, 500);
+        });
+    </script>
+</body>
+</html>

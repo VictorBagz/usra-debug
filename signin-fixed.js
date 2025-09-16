@@ -19,7 +19,11 @@ document.addEventListener('DOMContentLoaded', function() {
     const forgotPassword = document.getElementById('forgotPassword');
 
     // Check if user is already authenticated (redirect if so)
-    window.USRAAuth.redirectIfAuthenticated('dashboard.html');
+    setTimeout(() => {
+        if (window.USRANavAuth && window.USRANavAuth.isAuthenticated) {
+            window.location.href = 'dashboard.html';
+        }
+    }, 1000);
 
     // Handle sign in form submission
     if (signinForm) {
@@ -39,7 +43,15 @@ document.addEventListener('DOMContentLoaded', function() {
             btnSignIn.innerHTML = '<span class="loading"></span> Signing in...';
 
             try {
-                const { data, error } = await window.USRAAuth.signInWithEmail(email, password);
+                // Wait for auth system to be ready
+                if (!window.USRANavAuth || !window.USRANavAuth.supabase) {
+                    throw new Error('Authentication system not ready. Please refresh the page.');
+                }
+                
+                const { data, error } = await window.USRANavAuth.supabase.auth.signInWithPassword({
+                    email: email,
+                    password: password
+                });
                 
                 if (error) {
                     showStatus(getErrorMessage(error), 'error');
