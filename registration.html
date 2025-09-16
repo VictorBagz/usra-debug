@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>School Registration - Uganda Schools Rugby Association (USRA)</title>
+	<!-- Preload critical resources -->
+	<link rel="preload" href="styles.css" as="style">
+	<link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" as="style">
+	<link rel="preload" href="photos/usraLogo.png" as="image">
+	
+	<!-- Critical CSS -->
+	<link rel="stylesheet" href="styles.css">
+	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+	
+	<!-- Non-critical CSS - load asynchronously -->
+	<link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+	<noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></noscript>
+	
+	<link rel="preload" href="https://unpkg.com/aos@2.3.1/dist/aos.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+	<noscript><link rel="stylesheet" href="https://unpkg.com/aos@2.3.1/dist/aos.css"></noscript>
+	
+	<!-- Scripts -->
+	<script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+	<!-- In registration.html, signin.html, dashboard.html -->
+	
+	<!-- Additional styles for password field -->
+	<style>
+		.input-wrapper {
+			position: relative;
+		}
+		
+		.password-toggle {
+			position: absolute;
+			right: 15px;
+			top: 50%;
+			transform: translateY(-50%);
+			background: none;
+			border: none;
+			color: #999;
+			cursor: pointer;
+			padding: 5px;
+			font-size: 1rem;
+			transition: color 0.3s ease;
+		}
+		
+		.password-toggle:hover {
+			color: var(--primary-red);
+		}
+		
+		.password-strength {
+			margin-top: 8px;
+		}
+		
+		.strength-bar {
+			width: 100%;
+			height: 4px;
+			background-color: #e0e0e0;
+			border-radius: 2px;
+			overflow: hidden;
+			margin-bottom: 5px;
+		}
+		
+		.strength-fill {
+			height: 100%;
+			width: 0%;
+			transition: all 0.3s ease;
+			border-radius: 2px;
+		}
+		
+		.strength-text {
+			font-size: 0.8rem;
+			font-weight: 500;
+			transition: color 0.3s ease;
+		}
+		
+		/* Ensure password input has padding for the toggle button */
+		#adminPassword {
+			padding-right: 45px !important;
+		}
+	</style>
+</head>
+<body>
+	<!-- Simple & Professional Navigation -->
+	<nav class="navbar">
+		<div class="nav-container">
+			<a href="index.html" class="nav-logo">
+				<img src="photos/usraLogo.png" alt="USRA Logo">
+				<span>USRA</span>
+			</a>
+			<ul class="nav-menu">
+				<li><a href="index.html" class="nav-link">Home</a></li>
+				<li><a href="events.html" class="nav-link">Events</a></li>
+				<li><a href="signin.html" class="nav-link">Sign In</a></li>
+				<li><a href="index.html#about" class="nav-link">About</a></li>
+				<li class="nav-more">
+					<a href="#" class="nav-link">More ↓</a>
+					<ul class="dropdown-menu">
+						<li><a href="leadership.html">Leadership</a></li>
+						<li><a href="workplan.html">Workplan 2025</a></li>
+						<li><a href="medical-fund.html">Medical Fund</a></li>
+						<li><a href="photos.html">Photos</a></li>
+					</ul>
+				</li>
+				<li><a href="index.html#contact" class="nav-link">Contact</a></li>
+				<li id="navDashboard" style="display:none;"><a href="dashboard.html" class="nav-link">Dashboard</a></li>
+			</ul>
+			<div class="hamburger">
+				<span class="bar"></span>
+				<span class="bar"></span>
+				<span class="bar"></span>
+			</div>
+		</div>
+	</nav>
+
+	<!-- Registration Hero Section -->
+	<section class="registration-hero">
+		<div class="registration-hero-background">
+			<div class="hero-overlay"></div>
+		</div>
+		<div class="container">
+			<div class="registration-hero-content" data-aos="fade-up">
+				<div class="breadcrumb">
+					<a href="index.html">Home</a> <i class="fas fa-chevron-right"></i> <span>Registration</span>
+				</div>
+				<h1>School Registration</h1>
+				<p>Join the Uganda Schools Rugby Association and become part of the growing rugby community</p>
+				<div class="hero-stats">
+					<div class="hero-stat">
+						<div class="stat-number">150+</div>
+						<div class="stat-label">Member Schools</div>
+					</div>
+					<div class="hero-stat">
+						<div class="stat-number">2500+</div>
+						<div class="stat-label">Students</div>
+					</div>
+					<div class="hero-stat">
+						<div class="stat-number">25</div>
+						<div class="stat-label">Tournaments</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<!-- Registration Process Steps -->
+	<section class="registration-steps">
+		<div class="container">
+			<div class="section-header" data-aos="fade-up">
+				<h2>Registration Process</h2>
+				<p>Follow these simple steps to join USRA</p>
+			</div>
+			
+			<div class="steps-grid" data-aos="fade-up" data-aos-delay="200">
+				<div class="step-item">
+					<div class="step-number">01</div>
+					<div class="step-content">
+						<h3>School Information</h3>
+						<p>Provide complete school details including contact information and location</p>
+					</div>
+				</div>
+				
+				<div class="step-item">
+					<div class="step-number">02</div>
+					<div class="step-content">
+						<h3>Representative Details</h3>
+						<p>Submit personal information and required documents for verification</p>
+					</div>
+				</div>
+				
+					<div class="step-item">
+						<div class="step-number">03</div>
+						<div class="step-content">
+							<h3>Submit & Review</h3>
+							<p>Review your information and submit your registration application</p>
+						</div>
+					</div>
+				
+			</div>
+		</div>
+	</section>
+
+	<!-- Main Registration Section -->
+	<section class="registration-main">
+		<div class="container">
+			<div class="registration-wrapper">
+				
+				<!-- Authentication & Guidelines Sidebar -->
+				<div class="registration-sidebar">
+					
+
+					<!-- Guidelines Section -->
+					<div class="guidelines-section" data-aos="fade-right" data-aos-delay="200">
+						<div class="section-card">
+							<div class="card-header">
+								<div class="card-icon">
+									<i class="fas fa-info-circle"></i>
+								</div>
+								<h3>Registration Guidelines</h3>
+							</div>
+							
+							<div class="guidelines-content">
+								<div class="guideline-item">
+									<i class="fas fa-check-circle"></i>
+									<div>
+										<h4>Required Fields</h4>
+										<p>All fields marked with asterisk (*) are mandatory</p>
+									</div>
+								</div>
+								
+								<div class="guideline-item">
+									<i class="fas fa-image"></i>
+									<div>
+										<h4>Image Upload</h4>
+										<p>Images should be clear, JPG/PNG format, maximum 5MB</p>
+									</div>
+								</div>
+								
+								<div class="guideline-item">
+									<i class="fas fa-file-pdf"></i>
+									<div>
+										<h4>Documents</h4>
+										<p>Supporting documents in PDF format, maximum 10MB</p>
+									</div>
+								</div>
+								
+								<div class="guideline-item">
+									<i class="fas fa-shield-alt"></i>
+									<div>
+										<h4>Data Security</h4>
+										<p>All information is securely stored and verified</p>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<!-- Registration Form -->
+				<div class="registration-form-container" data-aos="fade-left">
+					<div class="form-progress">
+						<div class="progress-step active" data-step="1">
+							<div class="step-circle">1</div>
+							<span>School Info</span>
+						</div>
+						<div class="progress-line"></div>
+						<div class="progress-step" data-step="2">
+							<div class="step-circle">2</div>
+							<span>Representative</span>
+						</div>
+						<div class="progress-line"></div>
+						<div class="progress-step" data-step="3">
+							<div class="step-circle">3</div>
+							<span>Submit</span>
+						</div>
+					</div>
+
+					<form id="schoolRegistrationForm" enctype="multipart/form-data" data-autosave="registration" class="registration-form">
+						
+						<!-- Step 1: School Information -->
+						<div class="form-step active" data-step="1">
+							<div class="step-header">
+								<h3><i class="fas fa-school"></i> School Information</h3>
+								<p>Provide your school's basic information and contact details</p>
+							</div>
+							
+							<div class="form-grid">
+								<div class="form-group full-width">
+									<label for="schoolName">School Name <span class="required">*</span></label>
+									<input type="text" id="schoolName" name="schoolName" placeholder="Enter full school name" required>
+								</div>
+								
+								<div class="form-group">
+									<label for="centerNumber">School Centre Number <span class="required">*</span></label>
+									<input type="text" id="centerNumber" name="centerNumber" placeholder="e.g. U001" required>
+								</div>
+								
+								<div class="form-group">
+									<label for="schoolEmail">School Email <span class="required">*</span></label>
+									<input type="email" id="schoolEmail" name="schoolEmail" placeholder="school@example.com" required>
+								</div>
+								
+								<div class="form-group">
+									<label for="schoolPhone1">Primary Contact <span class="required">*</span></label>
+									<input type="tel" id="schoolPhone1" name="schoolPhone1" placeholder="+256 700 000 000" required>
+								</div>
+								
+								<div class="form-group">
+									<label for="schoolPhone2">Secondary Contact</label>
+									<input type="tel" id="schoolPhone2" name="schoolPhone2" placeholder="+256 700 000 000">
+								</div>
+								
+								<div class="form-group full-width">
+									<label for="address">School Address <span class="required">*</span></label>
+									<input type="text" id="address" name="address" placeholder="Complete school address" required>
+								</div>
+								
+								<div class="form-group">
+									<label for="region">Region <span class="required">*</span></label>
+									<select id="region" name="region" required>
+										<option value="">Select region</option>
+										<option value="Central">Central</option>
+										<option value="Eastern">Eastern</option>
+										<option value="Northern">Northern</option>
+										<option value="Western">Western</option>
+										<option value="West Nile">West Nile</option>
+										<option value="Karamoja">Karamoja</option>
+										<option value="South Western">South Western</option>
+										<option value="Bugisu">Bugisu</option>
+									</select>
+								</div>
+								
+								<div class="form-group">
+									<label for="district">District <span class="required">*</span></label>
+									<input type="text" id="district" name="district" placeholder="Enter district name" required>
+								</div>
+								
+								<div class="form-group full-width">
+									<label for="schoolBadge">School Badge</label>
+									<div class="file-upload">
+										<input type="file" id="schoolBadge" name="schoolBadge" accept="image/*">
+										<div class="file-upload-area">
+											<i class="fas fa-cloud-upload-alt"></i>
+											<span>Choose school badge image</span>
+											<small>PNG/JPG, max 5MB</small>
+										</div>
+									</div>
+								</div>
+							</div>
+							
+							<div class="step-navigation">
+								<button type="button" class="btn btn-primary next-step">
+									Next Step <i class="fas fa-arrow-right"></i>
+								</button>
+							</div>
+						</div>
+
+						<!-- Step 2: Administrator Information -->
+						<div class="form-step" data-step="2">
+						<div class="step-header">
+							<h3><i class="fas fa-user-tie"></i> School Representative Information</h3>
+							<p>Provide details about the school representative or contact person</p>
+						</div>
+							
+							<div class="form-grid">
+								<div class="form-group">
+									<label for="adminFullName">Full Name <span class="required">*</span></label>
+									<input type="text" id="adminFullName" name="adminFullName" placeholder="Enter full name" required>
+								</div>
+								
+								<div class="form-group">
+									<label for="nin">National ID Number (NIN) <span class="required">*</span></label>
+									<input type="text" id="nin" name="nin" placeholder="Enter NIN" required>
+								</div>
+								
+								<div class="form-group">
+									<label for="role">Role/Position <span class="required">*</span></label>
+									<input type="text" id="role" name="role" placeholder="e.g. Headteacher, Sports Coordinator" required>
+								</div>
+								
+								<div class="form-group">
+									<label for="sex">Gender <span class="required">*</span></label>
+									<select id="sex" name="sex" required>
+										<option value="">Select gender</option>
+										<option value="Male">Male</option>
+										<option value="Female">Female</option>
+									</select>
+								</div>
+								
+								<div class="form-group">
+									<label for="qualification">Highest Qualification <span class="required">*</span></label>
+									<input type="text" id="qualification" name="qualification" placeholder="e.g. Bachelor's Degree, Master's" required>
+								</div>
+								
+								<div class="form-group">
+									<label for="contact1">Primary Contact <span class="required">*</span></label>
+									<input type="tel" id="contact1" name="contact1" placeholder="+256 700 000 000" required>
+								</div>
+								
+								<div class="form-group">
+									<label for="contact2">Secondary Contact</label>
+									<input type="tel" id="contact2" name="contact2" placeholder="+256 700 000 000">
+								</div>
+								
+								<div class="form-group">
+									<label for="adminPassword">Password for Sign In <span class="required">*</span></label>
+									<div class="input-wrapper">
+										<input type="password" id="adminPassword" name="adminPassword" placeholder="Create a password for future sign-ins" required minlength="6">
+										<button type="button" class="password-toggle" onclick="togglePassword('adminPassword')">
+											<i class="fas fa-eye" id="adminPasswordIcon"></i>
+										</button>
+									</div>
+									<div id="passwordStrength" class="password-strength" style="display: none;">
+										<div class="strength-bar">
+											<div class="strength-fill"></div>
+										</div>
+										<span class="strength-text">Password strength: Weak</span>
+									</div>
+									<small style="color: #666; font-size: 0.8rem; margin-top: 5px; display: block;">
+										This password will be used to sign in to your administrator account. Minimum 6 characters.
+									</small>
+								</div>
+								
+								<div class="form-group">
+									<label for="profilePhoto">Profile Photo</label>
+									<div class="file-upload">
+										<input type="file" id="profilePhoto" name="profilePhoto" accept="image/*">
+										<div class="file-upload-area">
+											<i class="fas fa-camera"></i>
+											<span>Upload profile photo</span>
+											<small>PNG/JPG, max 5MB</small>
+										</div>
+									</div>
+								</div>
+								
+								<div class="form-group full-width">
+									<label for="supportingDocs">TMIS Certificate</label>
+									<div class="file-upload">
+										<input type="file" id="supportingDocs" name="supportingDocs" accept="application/pdf">
+										<div class="file-upload-area">
+											<i class="fas fa-file-pdf"></i>
+											<span>Upload TMIS certificate</span>
+											<small>PDF format, max 10MB</small>
+										</div>
+									</div>
+								</div>
+							</div>
+							
+							<div class="step-navigation">
+								<button type="button" class="btn btn-outline prev-step">
+									<i class="fas fa-arrow-left"></i> Previous
+								</button>
+								<button type="button" class="btn btn-primary next-step">
+									Next Step <i class="fas fa-arrow-right"></i>
+								</button>
+							</div>
+						</div>
+
+						<!-- Step 3: Review & Submit -->
+						<div class="form-step" data-step="3">
+							<div class="step-header">
+								<h3><i class="fas fa-check-circle"></i> Review & Submit</h3>
+								<p>Please review your information before submitting</p>
+							</div>
+							
+							<div class="form-summary">
+								<div class="summary-section">
+									<h4>School Information</h4>
+									<div class="summary-grid">
+										<div class="summary-item">
+											<span class="label">School Name:</span>
+											<span class="value" data-field="schoolName">-</span>
+										</div>
+										<div class="summary-item">
+											<span class="label">Centre Number:</span>
+											<span class="value" data-field="centerNumber">-</span>
+										</div>
+										<div class="summary-item">
+											<span class="label">Region:</span>
+											<span class="value" data-field="region">-</span>
+										</div>
+										<div class="summary-item">
+											<span class="label">District:</span>
+											<span class="value" data-field="district">-</span>
+										</div>
+									</div>
+								</div>
+								
+								<div class="summary-section">
+									<h4>School Representative Information</h4>
+									<div class="summary-grid">
+										<div class="summary-item">
+											<span class="label">Name:</span>
+											<span class="value" data-field="adminFullName">-</span>
+										</div>
+										<div class="summary-item">
+											<span class="label">Role:</span>
+											<span class="value" data-field="role">-</span>
+										</div>
+										<div class="summary-item">
+											<span class="label">Contact:</span>
+											<span class="value" data-field="contact1">-</span>
+										</div>
+										<div class="summary-item">
+											<span class="label">Email:</span>
+											<span class="value" data-field="schoolEmail">-</span>
+										</div>
+									</div>
+								</div>
+							</div>
+							
+							<div class="terms-section">
+								<label class="checkbox-wrapper">
+									<input type="checkbox" id="termsAccept" required>
+									<span class="checkmark"></span>
+									<span class="checkbox-text">I confirm that all information provided is accurate and I agree to USRA's <a href="#" class="terms-link">terms and conditions</a></span>
+								</label>
+							</div>
+							
+							<div class="step-navigation">
+								<button type="button" class="btn btn-outline prev-step">
+									<i class="fas fa-arrow-left"></i> Previous
+								</button>
+								<button type="submit" class="btn btn-primary submit-form">
+									<i class="fas fa-paper-plane"></i> Submit Registration
+								</button>
+							</div>
+							
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<!-- Footer -->
+	<footer class="footer">
+		<div class="container">
+			<div class="footer-content">
+				<div class="footer-section">
+					<div class="footer-logo">
+						<img src="photos/usraLogo.png" alt="USRA Logo" loading="lazy">
+						<span>USRA</span>
+					</div>
+					<p>Developing the future of rugby in Uganda through school sports excellence.</p>
+					<div class="social-links">
+						<a href="#"><i class="fab fa-facebook"></i></a>
+						<a href="@USRA_Official1"><i class="fab fa-twitter"></i></a>
+						<a href="#"><i class="fab fa-instagram"></i></a>
+						<a href="#"><i class="fab fa-youtube"></i></a>
+					</div>
+				</div>
+				<div class="footer-section">
+					<h4>Quick Links</h4>
+					<ul>
+						<li><a href="index.html#home">Home</a></li>
+						<li><a href="index.html#about">About</a></li>
+						<li><a href="index.html#chairman">Chairman's Message</a></li>
+						<li><a href="registration.html">Registration</a></li>
+						<li><a href="https://athletesmedicalfund.com/">Athletes Medical Fund</a></li>
+					</ul>
+				</div>
+				<div class="footer-section">
+					<h4>Downloads</h4>
+					<ul>
+						<li><a href="photos/2025 USRA COMPETITIONS MANUAL FINAL.pdf" download="USRA-Tournament-Manual-2025.pdf" target="_blank">
+							<i class="fas fa-download"></i> Tournament Manual</a></li>
+						<li><a href="assets/docs/school-registration-form.pdf" download="USRA-School-Registration-Form.pdf" target="_blank">
+							<i class="fas fa-download"></i> Registration Form</a></li>
+						<li><a href="photos/USRA ACCOUNTABILITY FORM.pdf" download="USRA-Accountability-Form.pdf" target="_blank">
+							<i class="fas fa-download"></i> Accountability Form</a></li>
+					</ul>
+				</div>
+				<div class="footer-section">
+					<h4>Newsletter</h4>
+					<p>Subscribe to our newsletter for updates</p>
+					<form class="newsletter-form">
+						<input type="email" placeholder="Enter your email">
+						<button type="submit" class="btn btn-primary">Subscribe</button>
+					</form>
+				</div>
+			</div>
+			<div class="footer-bottom">
+				<p>&copy; 2025 Uganda Schools Rugby Association. All rights reserved.</p>
+			</div>
+		</div>
+	</footer>
+
+	<!-- Load scripts asynchronously for better performance -->
+	<script async src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+	<script defer src="auth-system-fixed.js"></script>
+	<script defer src="script.js"></script>
+	<script defer src="registration-form-final.js"></script>
+</body>
+</html>
+
