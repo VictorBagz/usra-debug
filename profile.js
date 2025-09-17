@@ -1,7 +1,10 @@
 // Profile Page JavaScript
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM Content Loaded - Initializing Profile Page');
+    
     // Initialize AOS if available
     if (typeof AOS !== 'undefined') {
+        console.log('Initializing AOS animation library');
         AOS.init({
             duration: 1000,
             easing: 'ease-in-out',
@@ -19,6 +22,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Set up print functionality
     if (printButton) {
         printButton.addEventListener('click', function() {
+            console.log('Print button clicked');
             window.print();
         });
     }
@@ -26,18 +30,22 @@ document.addEventListener('DOMContentLoaded', function() {
     // Hide loading overlay after content loads
     setTimeout(() => {
         if (loadingOverlay) {
+            console.log('Hiding loading overlay');
             loadingOverlay.style.display = 'none';
         }
     }, 1000);
 
     function loadProfileData() {
+        console.log('Loading profile data...');
         try {
             // Try to get data from URL parameters first
             const urlParams = new URLSearchParams(window.location.search);
             const schoolId = urlParams.get('schoolId');
+            console.log('URL Parameters:', Object.fromEntries(urlParams.entries()));
             
             let data = null;
             
+<<<<<<< HEAD
             // Check for current school data (from signin system)
             const currentSchoolData = sessionStorage.getItem('currentSchool');
             if (currentSchoolData) {
@@ -54,17 +62,45 @@ document.addEventListener('DOMContentLoaded', function() {
                     if (localStorageData) {
                         data = JSON.parse(localStorageData);
                     }
+=======
+            // Look in sessionStorage first (where our registration system saves data)
+            const storedData = sessionStorage.getItem('registrationData');
+            console.log('Session Storage Data:', storedData ? 'Exists' : 'Not found');
+            
+            if (storedData) {
+                console.log('Parsing session storage data');
+                data = JSON.parse(storedData);
+                console.log('Session Data:', data);
+            } else {
+                // Fallback to localStorage (for backward compatibility)
+                console.log('Checking localStorage for registration data');
+                const localStorageData = localStorage.getItem('registrationData');
+                console.log('Local Storage Data:', localStorageData ? 'Exists' : 'Not found');
+                
+                if (localStorageData) {
+                    console.log('Parsing local storage data');
+                    data = JSON.parse(localStorageData);
+                    console.log('Local Data:', data);
+>>>>>>> 3c6278c8a7c0272c365434a4043ce6bb239a574b
                 }
             }
 
             if (data) {
+                console.log('Data found, populating profile');
                 populateProfileData(data);
+<<<<<<< HEAD
                 // Clear sessionStorage after use for security (but keep currentSchool for navigation)
                 if (sessionStorage.getItem('registrationData')) {
                     sessionStorage.removeItem('registrationData');
                 }
+=======
+                // Clear sessionStorage after use for security
+                sessionStorage.removeItem('registrationData');
+                console.log('Cleared session storage data');
+>>>>>>> 3c6278c8a7c0272c365434a4043ce6bb239a574b
             } else {
                 // No data available, redirect to registration
+                console.warn('No registration data available');
                 showNoDataMessage();
             }
         } catch (error) {
@@ -74,6 +110,8 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function populateProfileData(data) {
+        console.log('Populating profile with data:', data);
+        
         // School Information - using snake_case field names to match registration data
         setElementText('schoolName', data.school_name || data.schoolName);
         setElementText('centerNumber', data.center_number || data.centerNumber);
@@ -92,14 +130,17 @@ document.addEventListener('DOMContentLoaded', function() {
         setElementText('adminContact1', data.contact1 || data.contact1);
 
         // Display school badge if available
+        console.log('Attempting to display school badge');
         displaySchoolBadge(data);
 
         // Handle uploaded files
+        console.log('Handling uploaded files');
         handleUploadedFiles(data);
 
         // Update page title with school name
         if (data.school_name || data.schoolName) {
             document.title = `${data.school_name || data.schoolName} - Registration Profile - USRA`;
+            console.log('Updated page title');
         }
 
         // Display registration date if available
@@ -118,55 +159,101 @@ document.addEventListener('DOMContentLoaded', function() {
                 dateInfo.style.cssText = 'margin-top: 10px; color: #666; font-size: 0.85rem;';
                 dateInfo.innerHTML = `<i class="fas fa-calendar"></i> Registered: ${registrationDate}`;
                 statusSection.appendChild(dateInfo);
+                console.log('Added registration date to profile');
             }
         }
     }
 
-    function displaySchoolBadge(data) {
-        // Handle both direct URLs and base64 data
-        let schoolBadgeUrl = null;
+  function displaySchoolBadge(data) {
+    console.log('Displaying school badge with data:', data);
+    
+    // Handle both direct URLs and base64 data
+    let schoolBadgeUrl = null;
+    
+    // Check for fileUrls first (this is where your data actually is)
+    if (data.fileUrls && data.fileUrls.schoolBadge) {
+        console.log('Found school badge in fileUrls.schoolBadge');
+        schoolBadgeUrl = data.fileUrls.schoolBadge;
+    }
+    // Then check for base64 data from our fallback system
+    else if (data.school_badge && data.school_badge.data) {
+        console.log('Found school badge in base64 format');
+        schoolBadgeUrl = data.school_badge.data;
+    } 
+    else if (data.schoolBadge && data.schoolBadge.data) {
+        console.log('Found school badge in schoolBadge.data property');
+        schoolBadgeUrl = data.schoolBadge.data;
+    }
+    else {
+        console.warn('No school badge found in data structure');
+        console.log('Available data keys:', Object.keys(data));
+    }
+
+    console.log('School badge URL:', schoolBadgeUrl);
+
+    if (schoolBadgeUrl) {
+        console.log('Creating school badge display');
+        // Find a good place to display the school badge
+        const schoolInfoSection = document.querySelector('.info-section');
+        if (schoolInfoSection) {
+            // Create a badge display element
+            const badgeContainer = document.createElement('div');
+            badgeContainer.style.cssText = `
+                text-align: center;
+                margin: 20px 0;
+                padding: 20px;
+                background: #f8f9fa;
+                border-radius: 10px;
+                border: 2px dashed #ddd;
+            `;
+            
+            badgeContainer.innerHTML = `
+                <h4 style="margin-bottom: 15px; color: var(--primary-red);">
+                    <i class="fas fa-image"></i> School Badge
+                </h4>
+                <img src="${schoolBadgeUrl}" alt="School Badge" 
+                     style="max-width: 200px; max-height: 200px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);"
+                     onerror="this.style.display='none'; console.error('Failed to load school badge image')">
+            `;
+            
+            // Insert after the school information grid
+            const infoGrid = schoolInfoSection.querySelector('.info-grid');
+            if (infoGrid) {
+                schoolInfoSection.insertBefore(badgeContainer, infoGrid.nextSibling);
+                console.log('School badge displayed successfully');
+            }
+        }
+    } else {
+        console.warn('No school badge URL available to display');
         
-        // Check for base64 data first
-        if (data.school_badge && data.school_badge.data) {
-            schoolBadgeUrl = data.school_badge.data;
-        } else if (data.schoolBadge) {
-            schoolBadgeUrl = data.schoolBadge;
-        } else if (data.fileUrls && data.fileUrls.schoolBadge) {
-            schoolBadgeUrl = data.fileUrls.schoolBadge;
-        }
-
-        if (schoolBadgeUrl) {
-            // Find a good place to display the school badge
-            const schoolInfoSection = document.querySelector('.info-section');
-            if (schoolInfoSection) {
-                // Create a badge display element
-                const badgeContainer = document.createElement('div');
-                badgeContainer.style.cssText = `
-                    text-align: center;
-                    margin: 20px 0;
-                    padding: 20px;
-                    background: #f8f9fa;
-                    border-radius: 10px;
-                    border: 2px dashed #ddd;
-                `;
-                
-                badgeContainer.innerHTML = `
-                    <h4 style="margin-bottom: 15px; color: var(--primary-red);">
-                        <i class="fas fa-image"></i> School Badge
-                    </h4>
-                    <img src="${schoolBadgeUrl}" alt="School Badge" 
-                         style="max-width: 200px; max-height: 200px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
-                `;
-                
-                // Insert after the school information grid
-                const infoGrid = schoolInfoSection.querySelector('.info-grid');
-                if (infoGrid) {
-                    schoolInfoSection.insertBefore(badgeContainer, infoGrid.nextSibling);
-                }
+        // Add a placeholder message
+        const schoolInfoSection = document.querySelector('.info-section');
+        if (schoolInfoSection) {
+            const noBadgeMessage = document.createElement('div');
+            noBadgeMessage.style.cssText = `
+                text-align: center;
+                margin: 20px 0;
+                padding: 20px;
+                background: #f8f9fa;
+                border-radius: 10px;
+                border: 2px dashed #ddd;
+                color: #666;
+            `;
+            
+            noBadgeMessage.innerHTML = `
+                <h4 style="margin-bottom: 15px; color: var(--primary-red);">
+                    <i class="fas fa-image"></i> School Badge
+                </h4>
+                <p><i class="fas fa-exclamation-triangle"></i> No school badge available</p>
+            `;
+            
+            const infoGrid = schoolInfoSection.querySelector('.info-grid');
+            if (infoGrid) {
+                schoolInfoSection.insertBefore(noBadgeMessage, infoGrid.nextSibling);
             }
         }
     }
-
+}
     function setElementText(elementId, value) {
         const element = document.getElementById(elementId);
         if (element) {
@@ -175,15 +262,21 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function handleUploadedFiles(data) {
+        console.log('Handling uploaded files with data:', data);
+        
         const fileDownloads = document.getElementById('fileDownloads');
         const documentsSection = document.getElementById('documentsSection');
         
-        if (!fileDownloads || !documentsSection) return;
+        if (!fileDownloads || !documentsSection) {
+            console.warn('File downloads or documents section not found');
+            return;
+        }
 
         const files = [];
         
         // Handle base64 file data from our fallback system
         if (data.school_badge && data.school_badge.data) {
+            console.log('Adding school badge to file list');
             files.push({
                 name: 'School Badge',
                 type: 'image',
@@ -192,16 +285,28 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
         
+        // Show profile photo above School Representative section if available
+        const profilePhotoImg = document.getElementById('profilePhoto');
         if (data.profile_photo && data.profile_photo.data) {
+            console.log('Adding profile photo to file list');
             files.push({
                 name: 'Profile Photo',
                 type: 'image',
                 icon: 'fas fa-camera',
                 url: data.profile_photo.data
             });
+            if (profilePhotoImg) {
+                profilePhotoImg.src = data.profile_photo.data;
+                profilePhotoImg.style.display = 'inline-block';
+            }
+        } else if (data.fileUrls && data.fileUrls.profilePhoto && profilePhotoImg) {
+            // Fallback for direct URL
+            profilePhotoImg.src = data.fileUrls.profilePhoto;
+            profilePhotoImg.style.display = 'inline-block';
         }
         
         if (data.supporting_docs && data.supporting_docs.data) {
+            console.log('Adding supporting docs to file list');
             files.push({
                 name: 'TMIS Certificate',
                 type: 'document',
@@ -212,9 +317,11 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Also handle direct URLs for backward compatibility
         if (!files.length && data.fileUrls) {
+            console.log('Checking fileUrls for uploaded files');
             const fileUrls = data.fileUrls;
             
             if (fileUrls.schoolBadge) {
+                console.log('Adding school badge from fileUrls');
                 files.push({
                     name: 'School Badge',
                     type: 'image',
@@ -224,6 +331,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             
             if (fileUrls.profilePhoto) {
+                console.log('Adding profile photo from fileUrls');
                 files.push({
                     name: 'Profile Photo',
                     type: 'image',
@@ -233,6 +341,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             
             if (fileUrls.supportingDocs) {
+                console.log('Adding supporting docs from fileUrls');
                 files.push({
                     name: 'TMIS Certificate',
                     type: 'document',
@@ -242,18 +351,23 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
 
+        console.log('Total files found:', files.length);
+        
         if (files.length > 0) {
+            console.log('Populating file downloads section');
             fileDownloads.innerHTML = '';
             files.forEach(file => {
                 const fileItem = createFileItem(file);
                 fileDownloads.appendChild(fileItem);
             });
         } else {
+            console.log('No files found, hiding documents section');
             documentsSection.style.display = 'none';
         }
     }
 
     function createFileItem(file) {
+        console.log('Creating file item:', file);
         const fileItem = document.createElement('div');
         fileItem.className = 'file-item';
         
@@ -277,6 +391,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function showNoDataMessage() {
+        console.log('Showing no data message');
         // Show message when no registration data is available
         const profileMain = document.querySelector('.profile-main');
         if (profileMain) {
@@ -314,6 +429,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     if (hamburger && navMenu) {
         hamburger.addEventListener('click', () => {
+            console.log('Hamburger menu clicked');
             hamburger.classList.toggle('active');
             navMenu.classList.toggle('active');
         });
@@ -321,6 +437,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Close mobile menu when clicking on links
         document.querySelectorAll('.nav-link').forEach(link => {
             link.addEventListener('click', () => {
+                console.log('Nav link clicked, closing menu');
                 hamburger.classList.remove('active');
                 navMenu.classList.remove('active');
             });
@@ -333,6 +450,7 @@ document.addEventListener('DOMContentLoaded', function() {
             e.preventDefault();
             const target = document.querySelector(this.getAttribute('href'));
             if (target) {
+                console.log('Smooth scrolling to:', this.getAttribute('href'));
                 target.scrollIntoView({
                     behavior: 'smooth',
                     block: 'start'
@@ -357,12 +475,14 @@ document.addEventListener('DOMContentLoaded', function() {
     // Auto-hide loading overlay on page interactions
     document.addEventListener('click', function() {
         if (loadingOverlay && loadingOverlay.style.display !== 'none') {
+            console.log('Hiding loading overlay on interaction');
             loadingOverlay.style.display = 'none';
         }
     });
 
     // Handle browser back button
     window.addEventListener('popstate', function(event) {
+        console.log('Browser back button pressed, clearing stored data');
         // Clear any stored registration data when navigating away
         sessionStorage.removeItem('registrationData');
         localStorage.removeItem('registrationData');
