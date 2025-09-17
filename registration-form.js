@@ -414,7 +414,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 address: formData.get('address'),
                 region: formData.get('region'),
                 district: formData.get('district'),
-                admin_full_name: formData.get('adminFullName'),
+                full_name: formData.get('adminFullName'),
                 nin: formData.get('nin'),
                 role: formData.get('role'),
                 sex: formData.get('sex'),
@@ -435,7 +435,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 password: formData.get('adminPassword'),
                 options: {
                     data: {
-                        full_name: schoolData.admin_full_name,
+                        full_name: schoolData.full_name,
                         role: 'school_admin'
                     }
                 }
@@ -812,7 +812,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 .insert([{
                     school_name: schoolData.school_name,
                     school_email: schoolData.school_email,
-                    admin_full_name: schoolData.admin_full_name,
+                    full_name: schoolData.full_name,
                     user_id: authData.user.id,
                     status: 'pending'
                 }]);
@@ -932,7 +932,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     school_name: formData.get('schoolName'),
                     center_number: formData.get('centerNumber'),
                     school_email: formData.get('schoolEmail'),
-                    admin_full_name: formData.get('adminFullName'),
+                    full_name: formData.get('adminFullName'),
                     created_at: new Date().toISOString(),
                     status: 'pending',
                     registration_date: new Date().toISOString().split('T')[0],

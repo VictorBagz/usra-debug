@@ -283,7 +283,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const schoolData = {
                 school_name: formData.get('schoolName') || 'Unknown School',
                 school_email: userEmail,
-                admin_full_name: formData.get('adminFullName') || 'Unknown Admin',
+                full_name: formData.get('adminFullName') || 'Unknown Admin',
                 status: 'pending',
                 registration_date: new Date().toISOString().split('T')[0],
                 user_id: authData.user.id

@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Check if user is already authenticated (redirect if so)
     setTimeout(() => {
         if (window.USRANavAuth && window.USRANavAuth.isAuthenticated) {
-            window.location.href = 'dashboard.html';
+            window.location.href = 'profile.html';
         }
     }, 1000);
 
@@ -60,7 +60,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     
                     // Redirect to dashboard after successful sign in
                     setTimeout(() => {
-                        window.location.href = 'dashboard.html';
+                        window.location.href = 'profile.html';
                     }, 1500);
                 } else {
                     showStatus('Sign in failed. Please try again.', 'error');

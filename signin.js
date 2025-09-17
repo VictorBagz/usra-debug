@@ -48,7 +48,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     
                     // Redirect to dashboard after successful sign in
                     setTimeout(() => {
-                        window.location.href = 'dashboard.html';
+                        window.location.href = 'profile.html';
                     }, 1500);
                 }
             } catch (error) {
@@ -164,7 +164,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 // User is already signed in, redirect to dashboard
                 showStatus('You are already signed in. Redirecting to dashboard...', 'success');
                 setTimeout(() => {
-                    window.location.href = 'dashboard.html';
+                    window.location.href = 'profile.html';
                 }, 2000);
             }
         } catch (error) {

@@ -213,7 +213,7 @@
                 <li><a href="profile.html?schoolId=${window.USRANavAuth.user.id}" class="dropdown-link">
                     <i class="fas fa-user"></i> My Profile
                 </a></li>
-                <li><a href="dashboard.html" class="dropdown-link">
+                <li><a href="profile.html" class="dropdown-link">
                     <i class="fas fa-tachometer-alt"></i> Dashboard
                 </a></li>
                 <li class="dropdown-divider"></li>

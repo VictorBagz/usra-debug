@@ -195,7 +195,7 @@
     }
     
     // Redirect if already authenticated
-    function redirectIfAuthenticated(redirectUrl = 'dashboard.html') {
+    function redirectIfAuthenticated(redirectUrl = 'profile.html') {
         onAuthStateChange((auth) => {
             if (auth.isAuthenticated) {
                 console.log('✅ Already authenticated, redirecting to dashboard');

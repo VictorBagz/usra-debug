@@ -258,7 +258,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 address: formData.get('address'),
                 region: formData.get('region'),
                 district: formData.get('district'),
-                admin_full_name: formData.get('adminFullName'),
+                full_name: formData.get('adminFullName'),
                 nin: formData.get('nin'),
                 role: formData.get('role'),
                 sex: formData.get('sex'),
@@ -279,7 +279,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 password: formData.get('adminPassword'),
                 options: {
                     data: {
-                        full_name: schoolData.admin_full_name,
+                        full_name: schoolData.full_name,
                         role: 'school_admin',
                         school_name: schoolData.school_name
                     }
