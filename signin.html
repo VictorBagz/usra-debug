@@ -25,7 +25,7 @@
 
 	<style>
 		.signin-hero {
-			background: linear-gradient(135deg, rgba(220, 20, 60, 0.95), rgba(139, 0, 0, 0.95)), url('photos/rugby-field.jpg');
+			background: linear-gradient(135deg, rgba(220, 20, 60, 0.95), rgba(139, 0, 0, 0.95)), url('photos/group.jpg');
 			background-size: cover;
 			background-position: center;
 			padding: 120px 0 80px;
@@ -220,16 +220,16 @@
 		<div class="container">
 			<div class="signin-container" data-aos="fade-up">
 				<div class="signin-header">
-					<h1><i class="fas fa-user-shield"></i> Administrator Sign In</h1>
-					<p>Access your dashboard and manage school registrations</p>
+					<h1><i class="fas fa-user-shield"></i> School Sign In</h1>
+					<p>Sign in with your school center number to access your profile</p>
 				</div>
 
 				<form id="signinForm" class="signin-form">
 					<div class="form-group">
-						<label for="email">Email Address</label>
+						<label for="centerNumber">School Center Number</label>
 						<div class="input-wrapper">
-							<i class="fas fa-envelope"></i>
-							<input type="email" id="email" name="email" placeholder="Enter your email address" required>
+							<i class="fas fa-school"></i>
+							<input type="text" id="centerNumber" name="centerNumber" placeholder="Enter your school center number" required>
 						</div>
 					</div>
 
@@ -249,7 +249,7 @@
 						
 						<button type="button" class="btn btn-outline" id="btnCreateAccount">
 							<i class="fas fa-user-plus"></i>
-							Create Administrator Account
+							Create Account for School
 						</button>
 
 						<a href="registration.html" class="btn btn-outline">
@@ -323,7 +323,7 @@
 
 	<!-- Load scripts asynchronously for better performance -->
 	<script async src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-	<script defer src="auth-nav-system.js"></script>
-	<script defer src="signin-fixed.js"></script>
+	<script defer src="supabaseClient.js"></script>
+	<script defer src="signin.js"></script>
 </body>
 </html>

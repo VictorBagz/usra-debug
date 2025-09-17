@@ -1,4 +1,4 @@
-// Sign In Page JavaScript
+// Sign In Page JavaScript - Updated for Center Number Authentication
 document.addEventListener('DOMContentLoaded', function() {
     // Initialize AOS if available
     if (typeof AOS !== 'undefined') {
@@ -26,11 +26,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
 
-            const email = document.getElementById('email').value.trim();
+            const centerNumber = document.getElementById('centerNumber').value.trim();
             const password = document.getElementById('password').value;
 
-            if (!email || !password) {
-                showStatus('Please enter both email and password', 'error');
+            if (!centerNumber || !password) {
+                showStatus('Please enter both center number and password', 'error');
                 return;
             }
 
@@ -39,21 +39,79 @@ document.addEventListener('DOMContentLoaded', function() {
             btnSignIn.innerHTML = '<span class="loading"></span> Signing in...';
 
             try {
-                const { data, error } = await window.USRA.signInWithEmail(email, password);
+                // Wait for USRA to be ready
+                let attempts = 0;
+                while ((!window.USRA || !window.USRA.supabase) && attempts < 10) {
+                    await new Promise(resolve => setTimeout(resolve, 200));
+                    attempts++;
+                }
                 
-                if (error) {
-                    showStatus(error.message, 'error');
-                } else {
-                    showStatus('Sign in successful! Redirecting...', 'success');
+                if (!window.USRA || !window.USRA.supabase) {
+                    showStatus('Authentication system not ready. Please refresh the page and try again.', 'error');
+                    return;
+                }
+                
+                console.log('🔍 Querying database for center number:', centerNumber);
+                
+                // Query the schools table to find the school with the given center number
+                const { data: schoolData, error: schoolError } = await window.USRA.supabase
+                    .from('schools')
+                    .select('*')
+                    .eq('center_number', centerNumber);
+
+                console.log('Database query result:', { schoolData, schoolError });
+
+                if (schoolError) {
+                    console.error('Database query error:', schoolError);
+                    showStatus(`Database error: ${schoolError.message}`, 'error');
+                    return;
+                }
+
+                if (!schoolData || schoolData.length === 0) {
+                    showStatus('Invalid center number. Please check and try again.', 'error');
+                    return;
+                }
+                
+                const school = schoolData[0];
+                console.log('Found school:', school);
+
+                // Check if the school has an associated user account
+                if (!school.user_id) {
+                    showStatus('No account found for this center number. Please contact the administrator.', 'error');
+                    return;
+                }
+
+                // Try to sign in with the school's email and provided password
+                const schoolEmail = school.school_email || school.email;
+                if (!schoolEmail) {
+                    showStatus('School email not found. Please contact the administrator.', 'error');
+                    return;
+                }
+
+                console.log('🔐 Attempting authentication with email:', schoolEmail);
+                
+                const { data: authData, error: authError } = await window.USRA.signInWithEmail(schoolEmail, password);
+                
+                console.log('Authentication result:', { authData, authError });
+                
+                if (authError) {
+                    showStatus(`Authentication failed: ${authError.message}`, 'error');
+                } else if (authData && authData.user) {
+                    showStatus('Sign in successful! Redirecting to profile...', 'success');
                     
-                    // Redirect to dashboard after successful sign in
+                    // Store school data in session for profile page
+                    sessionStorage.setItem('currentSchool', JSON.stringify(school));
+                    
+                    // Redirect to profile page after successful sign in
                     setTimeout(() => {
-                        window.location.href = 'dashboard.html';
+                        window.location.href = 'profile.html';
                     }, 1500);
+                } else {
+                    showStatus('Sign in failed. Please try again.', 'error');
                 }
             } catch (error) {
                 console.error('Sign in error:', error);
-                showStatus('Sign in failed. Please try again.', 'error');
+                showStatus(`Sign in failed: ${error.message}`, 'error');
             } finally {
                 // Reset button state
                 btnSignIn.disabled = false;
@@ -70,11 +128,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
 
-            const email = document.getElementById('email').value.trim();
+            const centerNumber = document.getElementById('centerNumber').value.trim();
             const password = document.getElementById('password').value;
 
-            if (!email || !password) {
-                showStatus('Please enter both email and password to create an account', 'error');
+            if (!centerNumber || !password) {
+                showStatus('Please enter both center number and password to create an account', 'error');
                 return;
             }
 
@@ -83,15 +141,48 @@ document.addEventListener('DOMContentLoaded', function() {
             btnCreateAccount.innerHTML = '<span class="loading"></span> Creating account...';
 
             try {
+                // First, find the school with the given center number
+                const { data: schoolData, error: schoolError } = await window.USRA.supabase
+                    .from('schools')
+                    .select('*')
+                    .eq('center_number', centerNumber)
+                    .single();
+
+                if (schoolError || !schoolData) {
+                    showStatus('Center number not found. Please check and try again.', 'error');
+                    return;
+                }
+
+                const email = schoolData.school_email || schoolData.email;
+                if (!email) {
+                    showStatus('No email found for this center number. Please contact the administrator.', 'error');
+                    return;
+                }
+
+                if (schoolData.user_id) {
+                    showStatus('An account already exists for this center number. Try signing in instead.', 'error');
+                    return;
+                }
+
                 const { data, error } = await window.USRA.signUpWithEmail(email, password);
                 
                 if (error) {
                     showStatus(error.message, 'error');
-                } else {
-                    showStatus('Account created successfully! Check your email to confirm your account.', 'success');
+                } else if (data.user) {
+                    // Update the school record with the new user_id
+                    const { error: updateError } = await window.USRA.supabase
+                        .from('schools')
+                        .update({ user_id: data.user.id })
+                        .eq('center_number', centerNumber);
+
+                    if (updateError) {
+                        console.error('Failed to link user to school:', updateError);
+                    }
+
+                    showStatus('Account created successfully! Check your email to confirm your account, then you can sign in.', 'success');
                     
                     // Clear form
-                    document.getElementById('email').value = '';
+                    document.getElementById('centerNumber').value = '';
                     document.getElementById('password').value = '';
                 }
             } catch (error) {
@@ -100,7 +191,7 @@ document.addEventListener('DOMContentLoaded', function() {
             } finally {
                 // Reset button state
                 btnCreateAccount.disabled = false;
-                btnCreateAccount.innerHTML = '<i class="fas fa-user-plus"></i> Create Administrator Account';
+                btnCreateAccount.innerHTML = '<i class="fas fa-user-plus"></i> Create Account for School';
             }
         });
     }
@@ -110,10 +201,10 @@ document.addEventListener('DOMContentLoaded', function() {
         forgotPassword.addEventListener('click', async function(e) {
             e.preventDefault();
             
-            const email = document.getElementById('email').value.trim();
+            const centerNumber = document.getElementById('centerNumber').value.trim();
             
-            if (!email) {
-                showStatus('Please enter your email address first', 'error');
+            if (!centerNumber) {
+                showStatus('Please enter your center number first', 'error');
                 return;
             }
 
@@ -123,6 +214,24 @@ document.addEventListener('DOMContentLoaded', function() {
             }
 
             try {
+                // First, find the school with the given center number
+                const { data: schoolData, error: schoolError } = await window.USRA.supabase
+                    .from('schools')
+                    .select('school_email, email')
+                    .eq('center_number', centerNumber)
+                    .single();
+
+                if (schoolError || !schoolData) {
+                    showStatus('Center number not found. Please check and try again.', 'error');
+                    return;
+                }
+
+                const email = schoolData.school_email || schoolData.email;
+                if (!email) {
+                    showStatus('No email found for this center number. Please contact the administrator.', 'error');
+                    return;
+                }
+
                 const { error } = await window.USRA.supabase.auth.resetPasswordForEmail(email, {
                     redirectTo: window.location.origin + '/reset-password.html'
                 });
@@ -161,10 +270,10 @@ document.addEventListener('DOMContentLoaded', function() {
             const { data: { user } } = await window.USRA.supabase.auth.getUser();
             
             if (user) {
-                // User is already signed in, redirect to dashboard
-                showStatus('You are already signed in. Redirecting to dashboard...', 'success');
+                // User is already signed in, redirect to profile
+                showStatus('You are already signed in. Redirecting to profile...', 'success');
                 setTimeout(() => {
-                    window.location.href = 'dashboard.html';
+                    window.location.href = 'profile.html';
                 }, 2000);
             }
         } catch (error) {

@@ -38,22 +38,31 @@ document.addEventListener('DOMContentLoaded', function() {
             
             let data = null;
             
-            // Look in sessionStorage first (where our registration system saves data)
-            const storedData = sessionStorage.getItem('registrationData');
-            if (storedData) {
-                data = JSON.parse(storedData);
+            // Check for current school data (from signin system)
+            const currentSchoolData = sessionStorage.getItem('currentSchool');
+            if (currentSchoolData) {
+                data = JSON.parse(currentSchoolData);
+                console.log('Loaded school data from signin:', data);
             } else {
-                // Fallback to localStorage (for backward compatibility)
-                const localStorageData = localStorage.getItem('registrationData');
-                if (localStorageData) {
-                    data = JSON.parse(localStorageData);
+                // Look in sessionStorage for registration data (where our registration system saves data)
+                const storedData = sessionStorage.getItem('registrationData');
+                if (storedData) {
+                    data = JSON.parse(storedData);
+                } else {
+                    // Fallback to localStorage (for backward compatibility)
+                    const localStorageData = localStorage.getItem('registrationData');
+                    if (localStorageData) {
+                        data = JSON.parse(localStorageData);
+                    }
                 }
             }
 
             if (data) {
                 populateProfileData(data);
-                // Clear sessionStorage after use for security
-                sessionStorage.removeItem('registrationData');
+                // Clear sessionStorage after use for security (but keep currentSchool for navigation)
+                if (sessionStorage.getItem('registrationData')) {
+                    sessionStorage.removeItem('registrationData');
+                }
             } else {
                 // No data available, redirect to registration
                 showNoDataMessage();
